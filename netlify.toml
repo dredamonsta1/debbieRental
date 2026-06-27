@@ -1,0 +1,13 @@
+[build]
+  base = "repRides-fleet"
+  command = "npm install && npm run build -w client"
+  publish = "client/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback — every unknown path serves index.html so React Router can take over.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
