@@ -41,6 +41,41 @@ export async function createRental(input: RentalInput): Promise<Rental> {
   return created;
 }
 
+export async function requestRental(input: RentalInput): Promise<Rental> {
+  const id = randomUUID();
+  db.prepare(
+    `INSERT INTO rentals (id, vehicle_id, customer_id, start_at, due_at, status, notes)
+     VALUES (?, ?, ?, ?, ?, 'requested', ?)`
+  ).run(id, input.vehicle_id, input.customer_id, input.start_at, input.due_at, input.notes ?? null);
+  const created = await getRental(id);
+  if (!created) throw new Error("Failed to create rental request");
+  return created;
+}
+
+export async function approveRental(id: string): Promise<Rental | null> {
+  const rental = await getRental(id);
+  if (!rental || rental.status !== "requested") return null;
+
+  const startMs = Date.parse(rental.start_at);
+  const status: RentalStatus = startMs <= Date.now() ? "active" : "scheduled";
+
+  const tx = db.transaction(() => {
+    db.prepare("UPDATE rentals SET status = ? WHERE id = ?").run(status, id);
+    if (status === "active") {
+      db.prepare("UPDATE vehicles SET status = 'rented' WHERE id = ?").run(rental.vehicle_id);
+    }
+  });
+  tx();
+  return getRental(id);
+}
+
+export async function rejectRental(id: string): Promise<boolean> {
+  const result = db
+    .prepare("DELETE FROM rentals WHERE id = ? AND status = 'requested'")
+    .run(id);
+  return result.changes > 0;
+}
+
 export async function returnRental(id: string): Promise<Rental | null> {
   const rental = await getRental(id);
   if (!rental) return null;

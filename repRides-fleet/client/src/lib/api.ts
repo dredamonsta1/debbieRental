@@ -48,5 +48,21 @@ export const api = {
       notes?: string;
     }) => request<Rental>("/rentals", { method: "POST", body: JSON.stringify(input) }),
     return: (id: string) => request<Rental>(`/rentals/${id}/return`, { method: "POST" }),
+    approve: (id: string) => request<Rental>(`/rentals/${id}/approve`, { method: "POST" }),
+    reject: (id: string) => request<void>(`/rentals/${id}/reject`, { method: "POST" }),
+  },
+  public: {
+    listAvailableVehicles: () => request<Vehicle[]>("/public/vehicles"),
+    requestRental: (input: {
+      customer: { name: string; email?: string; phone?: string; license_number?: string };
+      vehicle_id: string;
+      start_at: string;
+      due_at: string;
+      notes?: string;
+    }) =>
+      request<{ rental: Rental; customer: Customer }>("/public/rentals/request", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
   },
 };

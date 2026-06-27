@@ -4,11 +4,13 @@ import { FleetPage } from "@/pages/FleetPage";
 import { CustomersPage } from "@/pages/CustomersPage";
 import { RentalsPage } from "@/pages/RentalsPage";
 import { DueSoonPage } from "@/pages/DueSoonPage";
+import { RequestRentalPage } from "@/pages/RequestRentalPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/request" element={<RequestRentalPage />} />
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/fleet" replace />} />
           <Route path="/fleet" element={<FleetPage />} />

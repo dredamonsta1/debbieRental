@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Car, User, CalendarDays, Undo2 } from "lucide-react";
+import { Plus, Car, User, CalendarDays, Undo2, Check, X } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Vehicle, Customer, Rental } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -120,6 +120,30 @@ export function RentalsPage() {
     }
   }
 
+  async function handleApprove(id: string) {
+    try {
+      await api.rentals.approve(id);
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to approve rental");
+    }
+  }
+
+  async function handleReject(id: string) {
+    if (!confirm("Reject this rental request?")) return;
+    try {
+      await api.rentals.reject(id);
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to reject rental");
+    }
+  }
+
+  const requestedCount = useMemo(
+    () => rentals.filter((r) => r.status === "requested").length,
+    [rentals]
+  );
+
   const canSchedule = availableVehicles.length > 0 && customers.length > 0;
 
   return (
@@ -139,6 +163,13 @@ export function RentalsPage() {
           {availableVehicles.length === 0
             ? "No available vehicles. Add one in Fleet."
             : "No customers yet. Add one in Customers."}
+        </div>
+      )}
+
+      {requestedCount > 0 && (
+        <div className="rounded-md border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-900">
+          {requestedCount} pending request{requestedCount === 1 ? "" : "s"} below. Approve to
+          schedule, reject to discard.
         </div>
       )}
 
@@ -241,6 +272,7 @@ export function RentalsPage() {
             const vehicle = vehicleById.get(r.vehicle_id);
             const customer = customerById.get(r.customer_id);
             const open = r.status === "scheduled" || r.status === "active" || r.status === "overdue";
+            const requested = r.status === "requested";
             return (
               <Card key={r.id}>
                 <CardHeader>
@@ -275,6 +307,16 @@ export function RentalsPage() {
                     <div className="flex justify-end pt-2">
                       <Button variant="outline" size="sm" onClick={() => handleReturn(r.id)}>
                         <Undo2 className="h-3.5 w-3.5" /> Mark returned
+                      </Button>
+                    </div>
+                  )}
+                  {requested && (
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleReject(r.id)}>
+                        <X className="h-3.5 w-3.5" /> Reject
+                      </Button>
+                      <Button size="sm" onClick={() => handleApprove(r.id)}>
+                        <Check className="h-3.5 w-3.5" /> Approve
                       </Button>
                     </div>
                   )}

@@ -20,7 +20,7 @@ export interface Customer {
   created_at: string;
 }
 
-export type RentalStatus = "scheduled" | "active" | "returned" | "overdue";
+export type RentalStatus = "requested" | "scheduled" | "active" | "returned" | "overdue";
 
 export interface Rental {
   id: string;

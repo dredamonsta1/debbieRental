@@ -18,6 +18,13 @@ export async function getCustomer(id: string): Promise<Customer | null> {
   return row ?? null;
 }
 
+export async function findCustomerByEmail(email: string): Promise<Customer | null> {
+  const row = db
+    .prepare("SELECT * FROM customers WHERE email = ? COLLATE NOCASE LIMIT 1")
+    .get(email) as Customer | undefined;
+  return row ?? null;
+}
+
 export async function createCustomer(input: CustomerInput): Promise<Customer> {
   const id = randomUUID();
   db.prepare(

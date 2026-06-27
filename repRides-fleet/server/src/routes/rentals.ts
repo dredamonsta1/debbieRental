@@ -34,3 +34,15 @@ rentalsRouter.post("/:id/return", async (req, res) => {
   if (!returned) return res.status(404).json({ error: "Rental not found" });
   res.json(returned);
 });
+
+rentalsRouter.post("/:id/approve", async (req, res) => {
+  const approved = await repo.approveRental(req.params.id);
+  if (!approved) return res.status(404).json({ error: "Requested rental not found" });
+  res.json(approved);
+});
+
+rentalsRouter.post("/:id/reject", async (req, res) => {
+  const ok = await repo.rejectRental(req.params.id);
+  if (!ok) return res.status(404).json({ error: "Requested rental not found" });
+  res.status(204).send();
+});
