@@ -14,7 +14,7 @@ export function Layout() {
     <div className="flex h-full">
       <aside className="w-56 border-r border-zinc-200 bg-white p-4 flex flex-col gap-1">
         <div className="px-2 py-3 mb-2">
-          <div className="text-lg font-semibold text-zinc-900">repRides</div>
+          <div className="text-lg font-semibold text-zinc-900">ReputableRides</div>
           <div className="text-xs text-zinc-500">Fleet manager</div>
         </div>
         {nav.map(({ to, label, icon: Icon }) => (
