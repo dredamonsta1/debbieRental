@@ -62,7 +62,7 @@ export function LandingPage() {
           </div>
           <div className="relative h-56 sm:h-80 md:h-96">
             <img
-              src="/hero-car.png"
+              src="/hero-car.avif"
               alt=""
               className="absolute inset-0 w-full h-full object-contain object-center"
               onError={(e) => {
@@ -81,7 +81,7 @@ export function LandingPage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
           <div className="aspect-[4/3] bg-zinc-900 rounded-sm overflow-hidden">
             <img
-              src="/about-car.png"
+              src="/nissan.avif"
               alt=""
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -103,6 +103,48 @@ export function LandingPage() {
               transportation needs. Submit a request below and we'll get back to you to confirm
               your pickup.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Yellow stripe divider */}
+      <div className="h-3 bg-brand" />
+
+      {/* Group Trips */}
+      <section className="relative bg-white overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-y-0 right-0 w-full sm:w-2/3 bg-brand"
+          style={{ clipPath: "polygon(25% 0, 100% 0, 100% 100%, 0 100%)" }}
+        />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-14 sm:py-24 grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+          <div className="space-y-5 sm:space-y-7 md:order-1 order-2">
+            <h2 className="text-3xl sm:text-5xl font-black uppercase leading-[0.95] tracking-tight">
+              <Highlight>Group</Highlight> trips
+              <br />
+              made easy.
+            </h2>
+            <p className="text-base sm:text-lg text-zinc-800 max-w-md">
+              Our <strong>15-passenger van</strong> comes equipped to accommodate any group and
+              provide services for a variety of events and trip destinations.
+            </p>
+            <button
+              type="button"
+              onClick={scrollToForm}
+              className="bg-black text-white px-6 h-12 font-bold uppercase tracking-wide text-sm hover:bg-zinc-800 transition"
+            >
+              Request the Van
+            </button>
+          </div>
+          <div className="relative h-56 sm:h-80 md:h-96 md:order-2 order-1">
+            <img
+              src="/ford-van.avif"
+              alt=""
+              className="absolute inset-0 w-full h-full object-contain object-center"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
           </div>
         </div>
       </section>
