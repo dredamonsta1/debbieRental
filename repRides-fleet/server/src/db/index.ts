@@ -1,5 +1,6 @@
 import Database, { type Database as BetterSqliteDatabase } from "better-sqlite3";
-import { join } from "node:path";
+import { mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS vehicles (
@@ -41,6 +42,7 @@ CREATE INDEX IF NOT EXISTS idx_rentals_due_at ON rentals(due_at);
 `;
 
 const dbPath = process.env.DATABASE_PATH ?? join(process.cwd(), "data", "fleet.db");
+mkdirSync(dirname(dbPath), { recursive: true });
 
 export const db: BetterSqliteDatabase = new Database(dbPath);
 db.pragma("journal_mode = WAL");

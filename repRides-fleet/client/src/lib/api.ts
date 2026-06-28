@@ -1,9 +1,11 @@
 import type { Vehicle, Customer, Rental } from "@/types";
 import { getOwnerToken, clearOwnerToken } from "@/lib/auth";
 
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getOwnerToken();
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}/api${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",

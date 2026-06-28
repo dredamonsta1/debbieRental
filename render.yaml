@@ -1,0 +1,30 @@
+# Render Blueprint — one-click deploy for the repRides-fleet API.
+#
+# Heads up on data persistence:
+#   Free tier has no persistent disk, so the SQLite file resets on
+#   every deploy/restart. That's fine for early testing. Before going
+#   live with real customer data, either:
+#     (a) upgrade to a paid plan and uncomment the `disk:` block below
+#         (set DATABASE_PATH=/data/fleet.db), or
+#     (b) swap to Supabase (the planned long-term move).
+
+services:
+  - type: web
+    name: reprides-fleet-api
+    runtime: node
+    plan: free
+    rootDir: repRides-fleet
+    buildCommand: npm install && npm run -w server build
+    startCommand: npm run -w server start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: OWNER_PASSWORD
+        sync: false  # set this in the Render dashboard, never commit
+      - key: ALLOWED_ORIGIN
+        sync: false  # set to your Netlify URL, e.g. https://your-site.netlify.app
+    # disk:
+    #   name: fleet-data
+    #   mountPath: /data
+    #   sizeGB: 1

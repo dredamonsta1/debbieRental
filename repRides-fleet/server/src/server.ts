@@ -13,7 +13,17 @@ import { startReturnReminders } from "./jobs/return-reminders";
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 
-app.use(cors());
+const allowedOrigins = (process.env.ALLOWED_ORIGIN ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+    allowedHeaders: ["Content-Type", "X-Owner-Token"],
+  })
+);
 app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
