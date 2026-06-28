@@ -1,13 +1,23 @@
 import type { Vehicle, Customer, Rental } from "@/types";
+import { getOwnerToken, clearOwnerToken } from "@/lib/auth";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getOwnerToken();
   const res = await fetch(`/api${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { "X-Owner-Token": token } : {}),
       ...(init?.headers ?? {}),
     },
   });
+  if (res.status === 401) {
+    clearOwnerToken();
+    if (!window.location.pathname.startsWith("/login")) {
+      window.location.href = "/login";
+    }
+    throw new Error("Unauthorized");
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? `Request failed: ${res.status}`);
@@ -64,5 +74,14 @@ export const api = {
         method: "POST",
         body: JSON.stringify(input),
       }),
+  },
+  admin: {
+    login: (password: string) =>
+      request<{ token: string }>("/admin/login", {
+        method: "POST",
+        body: JSON.stringify({ password }),
+      }),
+    logout: () => request<void>("/admin/logout", { method: "POST" }),
+    checkSession: () => request<{ ok: true }>("/admin/session"),
   },
 };

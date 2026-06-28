@@ -1,6 +1,8 @@
-import { NavLink, Outlet } from "react-router-dom";
-import { Car, Users, CalendarClock, BellRing } from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Car, Users, CalendarClock, BellRing, LogOut } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { api } from "@/lib/api";
+import { clearOwnerToken } from "@/lib/auth";
 
 const nav = [
   { to: "/fleet", label: "Fleet", icon: Car },
@@ -10,6 +12,18 @@ const nav = [
 ];
 
 export function Layout() {
+  const navigate = useNavigate();
+
+  async function handleSignOut() {
+    try {
+      await api.admin.logout();
+    } catch {
+      // ignore — we're clearing the token locally either way
+    }
+    clearOwnerToken();
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className="flex h-full">
       <aside className="w-56 border-r border-zinc-200 bg-white p-4 flex flex-col gap-1">
@@ -32,6 +46,16 @@ export function Layout() {
             {label}
           </NavLink>
         ))}
+        <div className="mt-auto pt-2 border-t border-zinc-100">
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 w-full"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </button>
+        </div>
       </aside>
       <main className="flex-1 overflow-auto">
         <div className="mx-auto max-w-6xl p-8">
