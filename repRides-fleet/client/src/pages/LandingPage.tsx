@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { Highlight } from "@/components/Highlight";
 import { RequestRentalForm } from "@/components/RequestRentalForm";
 
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
+
 export function LandingPage() {
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -9,6 +11,11 @@ export function LandingPage() {
     if (window.location.hash === "#request") {
       formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    // Warm the API on first paint so the form's fetch isn't waiting on a
+    // 30-60s Render free-tier cold start when the user scrolls down.
+    fetch(`${API_BASE}/api/health`, { cache: "no-store" }).catch(() => {
+      // ignore — best-effort warm-up
+    });
   }, []);
 
   function scrollToForm() {

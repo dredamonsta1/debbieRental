@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Car, CheckCircle2 } from "lucide-react";
+import { Car, CheckCircle2, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Vehicle } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,10 @@ function toLocalInput(d: Date) {
 export function RequestRentalForm() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [slowLoad, setSlowLoad] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [slowSubmit, setSlowSubmit] = useState(false);
   const [confirmed, setConfirmed] = useState<string | null>(null);
   const [form, setForm] = useState(() => ({
     name: "",
@@ -30,6 +32,7 @@ export function RequestRentalForm() {
   }));
 
   useEffect(() => {
+    const slowTimer = setTimeout(() => setSlowLoad(true), 4000);
     api.public
       .listAvailableVehicles()
       .then((vs) => {
@@ -37,13 +40,19 @@ export function RequestRentalForm() {
         if (vs.length > 0) setForm((f) => (f.vehicle_id ? f : { ...f, vehicle_id: vs[0].id }));
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load"))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        clearTimeout(slowTimer);
+        setLoading(false);
+        setSlowLoad(false);
+      });
+    return () => clearTimeout(slowTimer);
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    const slowTimer = setTimeout(() => setSlowSubmit(true), 4000);
     try {
       const startIso = new Date(form.start_at).toISOString();
       const dueIso = new Date(form.due_at).toISOString();
@@ -66,6 +75,8 @@ export function RequestRentalForm() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to submit request");
     } finally {
+      clearTimeout(slowTimer);
+      setSlowSubmit(false);
       setSubmitting(false);
     }
   }
@@ -88,7 +99,22 @@ export function RequestRentalForm() {
   }
 
   if (loading) {
-    return <div className="text-center text-sm text-zinc-500 py-8">Loading available cars…</div>;
+    return (
+      <div className="text-center py-8 space-y-3">
+        <Loader2 className="h-6 w-6 animate-spin text-zinc-400 mx-auto" />
+        <div className="text-sm text-zinc-500">
+          {slowLoad ? (
+            <>
+              Waking up the server…
+              <br />
+              <span className="text-xs">First request after a quiet period can take up to a minute.</span>
+            </>
+          ) : (
+            "Loading available cars…"
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -218,14 +244,27 @@ export function RequestRentalForm() {
         </div>
       </section>
 
-      <Button
-        type="submit"
-        size="lg"
-        disabled={submitting}
-        className="w-full bg-black text-white hover:bg-zinc-800 h-12 text-base font-semibold"
-      >
-        {submitting ? "Submitting…" : "Submit request"}
-      </Button>
+      <div className="space-y-2">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={submitting}
+          className="w-full bg-black text-white hover:bg-zinc-800 h-12 text-base font-semibold"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Submitting…
+            </>
+          ) : (
+            "Submit request"
+          )}
+        </Button>
+        {slowSubmit && (
+          <p className="text-xs text-center text-zinc-500">
+            Still working — first request after a quiet period can take a moment.
+          </p>
+        )}
+      </div>
     </form>
   );
 }
