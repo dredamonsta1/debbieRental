@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Car, User, CalendarDays, Undo2, Check, X } from "lucide-react";
+import { Plus, Car, User, CalendarDays, Undo2, Check, X, ExternalLink } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Vehicle, Customer, Rental } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -148,14 +148,23 @@ export function RentalsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900">Rentals</h1>
           <p className="text-sm text-zinc-500">Schedule, track, and return rentals</p>
         </div>
-        <Button onClick={() => (showForm ? setShowForm(false) : openForm())} disabled={!canSchedule}>
-          <Plus className="h-4 w-4" /> Schedule rental
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => window.open("/#request", "_blank", "noopener")}
+            title="Open the customer request form in a new tab for a walk-in"
+          >
+            <ExternalLink className="h-4 w-4" /> Hand off to customer
+          </Button>
+          <Button onClick={() => (showForm ? setShowForm(false) : openForm())} disabled={!canSchedule}>
+            <Plus className="h-4 w-4" /> Schedule rental
+          </Button>
+        </div>
       </div>
 
       {!canSchedule && !loading && (
