@@ -8,6 +8,11 @@ export interface Vehicle {
   plate: string;
   status: VehicleStatus;
   photo_url: string | null;
+  seats: number | null;
+  transmission: string | null;
+  features: string | null;
+  daily_rate: number | null;
+  weekly_rate: number | null;
   created_at: string;
 }
 

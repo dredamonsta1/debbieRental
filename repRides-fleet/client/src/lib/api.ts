@@ -33,8 +33,17 @@ export const api = {
     list: (availableOnly?: boolean) =>
       request<Vehicle[]>(`/vehicles${availableOnly ? "?available=true" : ""}`),
     get: (id: string) => request<Vehicle>(`/vehicles/${id}`),
-    create: (input: Omit<Vehicle, "id" | "status" | "created_at" | "photo_url"> & {
+    create: (input: {
+      make: string;
+      model: string;
+      year: number;
+      plate: string;
       photo_url?: string | null;
+      seats?: number | null;
+      transmission?: string | null;
+      features?: string | null;
+      daily_rate?: number | null;
+      weekly_rate?: number | null;
     }) =>
       request<Vehicle>("/vehicles", { method: "POST", body: JSON.stringify(input) }),
     updateStatus: (id: string, status: Vehicle["status"]) =>

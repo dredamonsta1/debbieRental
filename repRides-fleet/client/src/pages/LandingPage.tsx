@@ -1,11 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Highlight } from "@/components/Highlight";
 import { RequestRentalForm } from "@/components/RequestRentalForm";
+import { FleetShowcase } from "@/components/FleetShowcase";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 export function LandingPage() {
   const formRef = useRef<HTMLDivElement>(null);
+  const [pickedVehicleId, setPickedVehicleId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (window.location.hash === "#request") {
@@ -20,6 +22,11 @@ export function LandingPage() {
 
   function scrollToForm() {
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function pickVehicleAndScroll(vehicleId: string) {
+    setPickedVehicleId(vehicleId);
+    scrollToForm();
   }
 
   return (
@@ -117,6 +124,22 @@ export function LandingPage() {
       {/* Yellow stripe divider */}
       <div className="h-3 bg-brand" />
 
+      {/* Our Fleet */}
+      <section id="fleet" className="bg-zinc-50">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24">
+          <div className="text-center space-y-3 mb-10">
+            <h2 className="text-3xl sm:text-5xl font-black uppercase leading-tight">
+              Our <Highlight>Fleet</Highlight>
+            </h2>
+            <p className="text-zinc-500">Pick a vehicle and request your rental.</p>
+          </div>
+          <FleetShowcase onPick={pickVehicleAndScroll} />
+        </div>
+      </section>
+
+      {/* Yellow stripe divider */}
+      <div className="h-3 bg-brand" />
+
       {/* Group Trips */}
       <section className="relative bg-white overflow-hidden">
         <div
@@ -168,7 +191,7 @@ export function LandingPage() {
             </h2>
             <p className="text-zinc-500">Fill out the form and we'll confirm shortly.</p>
           </div>
-          <RequestRentalForm />
+          <RequestRentalForm initialVehicleId={pickedVehicleId} />
         </div>
       </section>
 

@@ -16,11 +16,35 @@ vehiclesRouter.get("/:id", async (req, res) => {
 });
 
 vehiclesRouter.post("/", async (req, res) => {
-  const { make, model, year, plate, status, photo_url } = req.body ?? {};
+  const {
+    make,
+    model,
+    year,
+    plate,
+    status,
+    photo_url,
+    seats,
+    transmission,
+    features,
+    daily_rate,
+    weekly_rate,
+  } = req.body ?? {};
   if (!make || !model || !year || !plate) {
     return res.status(400).json({ error: "make, model, year, plate are required" });
   }
-  const created = await repo.createVehicle({ make, model, year, plate, status, photo_url });
+  const created = await repo.createVehicle({
+    make,
+    model,
+    year,
+    plate,
+    status,
+    photo_url,
+    seats,
+    transmission,
+    features,
+    daily_rate,
+    weekly_rate,
+  });
   res.status(201).json(created);
 });
 

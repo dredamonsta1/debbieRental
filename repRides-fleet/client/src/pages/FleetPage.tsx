@@ -8,7 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
-const emptyForm = { make: "", model: "", year: "", plate: "" };
+const emptyForm = {
+  make: "",
+  model: "",
+  year: "",
+  plate: "",
+  photo_url: "",
+  seats: "",
+  transmission: "",
+  features: "",
+  daily_rate: "",
+  weekly_rate: "",
+};
 
 export function FleetPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -43,6 +54,12 @@ export function FleetPage() {
         model: form.model,
         year: Number(form.year),
         plate: form.plate,
+        photo_url: form.photo_url || null,
+        seats: form.seats ? Number(form.seats) : null,
+        transmission: form.transmission || null,
+        features: form.features || null,
+        daily_rate: form.daily_rate ? Number(form.daily_rate) : null,
+        weekly_rate: form.weekly_rate ? Number(form.weekly_rate) : null,
       });
       setForm(emptyForm);
       setShowForm(false);
@@ -121,6 +138,66 @@ export function FleetPage() {
                   onChange={(e) => setForm({ ...form, plate: e.target.value })}
                 />
               </div>
+              <div className="space-y-1.5 col-span-2">
+                <Label htmlFor="photo_url">Photo URL</Label>
+                <Input
+                  id="photo_url"
+                  type="url"
+                  placeholder="https://… (Imgur, Cloudinary, Google Photos, etc.)"
+                  value={form.photo_url}
+                  onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="seats">Seats</Label>
+                <Input
+                  id="seats"
+                  type="number"
+                  min="1"
+                  value={form.seats}
+                  onChange={(e) => setForm({ ...form, seats: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="transmission">Transmission</Label>
+                <Input
+                  id="transmission"
+                  placeholder="automatic / manual"
+                  value={form.transmission}
+                  onChange={(e) => setForm({ ...form, transmission: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5 col-span-2">
+                <Label htmlFor="features">Features</Label>
+                <Input
+                  id="features"
+                  placeholder="AC, Bluetooth, Backup camera"
+                  value={form.features}
+                  onChange={(e) => setForm({ ...form, features: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="daily_rate">Daily rate ($)</Label>
+                <Input
+                  id="daily_rate"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.daily_rate}
+                  onChange={(e) => setForm({ ...form, daily_rate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="weekly_rate">Weekly rate ($)</Label>
+                <Input
+                  id="weekly_rate"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.weekly_rate}
+                  onChange={(e) => setForm({ ...form, weekly_rate: e.target.value })}
+                />
+              </div>
               <div className="col-span-2 flex gap-2 justify-end">
                 <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                   Cancel
@@ -149,7 +226,19 @@ export function FleetPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {vehicles.map((v) => (
-            <Card key={v.id}>
+            <Card key={v.id} className="overflow-hidden">
+              {v.photo_url && (
+                <div className="aspect-video bg-zinc-100">
+                  <img
+                    src={v.photo_url}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
@@ -163,10 +252,27 @@ export function FleetPage() {
                   <Badge variant={v.status}>{v.status}</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="flex justify-end">
-                <Button variant="ghost" size="sm" onClick={() => handleDelete(v.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+              <CardContent className="space-y-2 text-xs text-zinc-600">
+                {(v.daily_rate !== null || v.weekly_rate !== null) && (
+                  <div className="font-semibold text-zinc-900">
+                    {v.daily_rate !== null && <>${v.daily_rate}/day</>}
+                    {v.daily_rate !== null && v.weekly_rate !== null && " · "}
+                    {v.weekly_rate !== null && <>${v.weekly_rate}/wk</>}
+                  </div>
+                )}
+                {(v.seats !== null || v.transmission) && (
+                  <div>
+                    {v.seats !== null && `${v.seats} seats`}
+                    {v.seats !== null && v.transmission && " · "}
+                    {v.transmission}
+                  </div>
+                )}
+                {v.features && <div className="text-zinc-500">{v.features}</div>}
+                <div className="flex justify-end">
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(v.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

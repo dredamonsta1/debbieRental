@@ -12,7 +12,11 @@ function toLocalInput(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function RequestRentalForm() {
+interface RequestRentalFormProps {
+  initialVehicleId?: string;
+}
+
+export function RequestRentalForm({ initialVehicleId }: RequestRentalFormProps = {}) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [slowLoad, setSlowLoad] = useState(false);
@@ -47,6 +51,14 @@ export function RequestRentalForm() {
       });
     return () => clearTimeout(slowTimer);
   }, []);
+
+  // Update selected vehicle whenever the parent passes a new id (e.g. a
+  // "Request this car" click in the fleet showcase).
+  useEffect(() => {
+    if (initialVehicleId) {
+      setForm((f) => ({ ...f, vehicle_id: initialVehicleId }));
+    }
+  }, [initialVehicleId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -9,6 +9,11 @@ export interface VehicleInput {
   plate: string;
   status?: VehicleStatus;
   photo_url?: string | null;
+  seats?: number | null;
+  transmission?: string | null;
+  features?: string | null;
+  daily_rate?: number | null;
+  weekly_rate?: number | null;
 }
 
 export async function listVehicles(): Promise<Vehicle[]> {
@@ -29,8 +34,9 @@ export async function getVehicle(id: string): Promise<Vehicle | null> {
 export async function createVehicle(input: VehicleInput): Promise<Vehicle> {
   const id = randomUUID();
   db.prepare(
-    `INSERT INTO vehicles (id, make, model, year, plate, status, photo_url)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO vehicles
+     (id, make, model, year, plate, status, photo_url, seats, transmission, features, daily_rate, weekly_rate)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
     input.make,
@@ -38,7 +44,12 @@ export async function createVehicle(input: VehicleInput): Promise<Vehicle> {
     input.year,
     input.plate,
     input.status ?? "available",
-    input.photo_url ?? null
+    input.photo_url ?? null,
+    input.seats ?? null,
+    input.transmission ?? null,
+    input.features ?? null,
+    input.daily_rate ?? null,
+    input.weekly_rate ?? null
   );
   const created = await getVehicle(id);
   if (!created) throw new Error("Failed to create vehicle");
