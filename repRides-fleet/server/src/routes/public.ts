@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as customers from "../repositories/customers";
 import * as rentals from "../repositories/rentals";
 import * as vehicles from "../repositories/vehicles";
+import { sendOwnerSms } from "../notifications/sms";
 
 export const publicRouter = Router();
 
@@ -45,6 +46,18 @@ publicRouter.post("/rentals/request", async (req, res) => {
     due_at,
     notes: notes ?? null,
   });
+
+  // Notify the owner — fire-and-forget so SMS latency/failures don't
+  // affect the customer's submit response.
+  const siteUrl = process.env.SITE_URL ?? "";
+  const pickup = new Date(rental.start_at).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+  const link = siteUrl ? `${siteUrl}/rentals` : "/rentals";
+  void sendOwnerSms(
+    `ReputableRides: new request from ${cust.name} for ${vehicle.make} ${vehicle.model}, pickup ${pickup}. Approve: ${link}`
+  );
 
   res.status(201).json({ rental, customer: cust });
 });
